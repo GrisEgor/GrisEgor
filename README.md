@@ -1,5 +1,5 @@
 - 👋 Hi, I’m @GrisEgor
-- 👀 I’m interested in Data Science and Machine Learning, development in SWIFT, python
+- 👀 I’m interested in Data Science and Machine Learning, development using SWIFT, python, hope to start learning java someday!
 - 🌱 I’m currently learning Machine Learning and Data Analysis 
 - 💞️ I’m looking to collaborate on nothing yet
 - 📫 How to reach me My email: grisegor@yandex.ru
