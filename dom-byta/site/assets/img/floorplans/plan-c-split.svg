@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 400 264" role="img" aria-label="Схематичный план помещения: помещение, разделённое перегородкой на две зоны">
+  <style>
+    .wall { stroke: #211D1A; }
+    .hatch { stroke: #DDD5C7; }
+    .accent-door { stroke: #B4442E; }
+    .accent-window { stroke: #C08A34; }
+    .label { fill: #8C8377; }
+    .mask { fill: #FBF8F2; }
+    /* Тёмный вариант намеренно убран: Safari на iOS не применяет
+       prefers-color-scheme к SVG, подключённому картинкой, поэтому в
+       тёмной теме он всё равно рисовал бы светлый вариант. План всегда
+       лежит на светлом фоне (см. .carousel__slide--plan img в
+       styles.css), так что тёмные линии читаются в любой теме. */
+  </style>
+  <!-- Фон намеренно не задан: он приходит от <img> в styles.css и всегда
+       светлый, чтобы тёмные линии плана читались в обеих темах. -->
+  <g class="hatch" stroke-width="1">
+    <path d="M60 60 L60 240 M100 60 L100 240 M140 60 L140 240 M180 60 L180 240 M220 60 L220 240 M260 60 L260 240 M300 60 L300 240 M340 60 L340 240"/>
+  </g>
+  <rect x="40" y="40" width="320" height="220" fill="none" class="wall" stroke-width="6" stroke-linejoin="round"/>
+  <!-- partition wall with doorway -->
+  <line x1="200" y1="40" x2="200" y2="130" class="wall" stroke-width="6"/>
+  <line x1="200" y1="180" x2="200" y2="260" class="wall" stroke-width="6"/>
+  <path d="M200 130 A50 50 0 0 1 150 180" fill="none" class="accent-door" stroke-width="3" stroke-dasharray="4 3"/>
+  <!-- windows on left zone -->
+  <g class="accent-window" stroke-width="6">
+    <line x1="80" y1="40" x2="140" y2="40"/>
+  </g>
+  <!-- entrance door -->
+  <rect x="280" y="257" width="50" height="6" class="mask"/>
+  <path d="M280 260 A50 50 0 0 0 330 210" fill="none" class="accent-door" stroke-width="3" stroke-dasharray="4 3"/>
+  <line x1="280" y1="260" x2="280" y2="210" class="accent-door" stroke-width="4"/>
+  <text x="360" y="288" text-anchor="end" font-family="Arial, sans-serif" font-size="14" class="label">план ориентировочный</text>
+</svg>
