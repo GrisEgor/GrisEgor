@@ -396,13 +396,72 @@ function diffFields(data, base) {
   return out;
 }
 
+// Что именно предлагает собственник: по каждому полю «было» и «стало».
 function diffView(listing) {
-  const rows = Object.entries(listing.pendingChanges).map(([k, v]) => {
+  const rows = Object.entries(listing.pendingChanges).map(([k, after]) => {
     const before = listing[k];
-    const show = (x) => (k === "photos" ? `${x.length} ${plural(x.length, "фото", "фото", "фото")}` : k === "floorPlan" ? (FLOOR_PLANS.find((p) => p[0] === x)?.[1] || "без схемы") : String(x ?? "—"));
-    return h("div", { class: "diff-item" }, h("span", { class: "muted" }, FIELD_LABELS[k] || k), h("span", null, h("del", null, show(before)), " → ", h("ins", null, show(v))));
+    const label = h("span", { class: "diff-label" }, FIELD_LABELS[k] || k);
+    if (k === "photos") return h("div", { class: "diff-item" }, label, photosDiff(before || [], after || []));
+    if (k === "floorPlan") {
+      const plan = (url) =>
+        url
+          ? h("a", { class: "diff-thumb", href: src(url), target: "_blank", title: "Открыть" }, h("img", { src: src(url), alt: FLOOR_PLANS.find((p) => p[0] === url)?.[1] || "Схема" }))
+          : h("span", { class: "muted" }, "без схемы");
+      return h("div", { class: "diff-item" }, label, h("div", { class: "diff-pair" }, diffSide("Было", plan(before)), diffSide("Стало", plan(after))));
+    }
+    const show = (x) => {
+      if (x === undefined || x === null || x === "") return "—";
+      if (k === "areaM2") return `${fmtNum(x)} м²`;
+      if (k === "pricePerM2") return x ? `${fmtMoney(x)} за м²` : "по запросу";
+      if (k === "floor") return `${x} этаж`;
+      return String(x);
+    };
+    if (k === "description") {
+      return h("div", { class: "diff-item" }, label, h("div", { class: "diff-pair diff-pair--stack" }, diffSide("Было", h("del", { class: "diff-text" }, show(before))), diffSide("Стало", h("ins", { class: "diff-text" }, show(after)))));
+    }
+    return h("div", { class: "diff-item" }, label, h("span", null, h("del", null, show(before)), " → ", h("ins", null, show(after))));
   });
-  return h("div", { class: "diff", style: "margin-top: 8px" }, rows);
+  return h("div", { class: "diff" }, rows);
+}
+
+function diffSide(title, content) {
+  return h("div", { class: "diff-side" }, h("span", { class: "diff-side__title" }, title), content);
+}
+
+// Фото: новые подсвечены, удалённые помечены; клик открывает фото целиком.
+function photosDiff(before, after) {
+  const thumbRow = (list, other, mark) =>
+    list.length
+      ? h(
+          "div",
+          { class: "diff-photos" },
+          list.map((url, i) => {
+            const changed = !other.includes(url);
+            return h(
+              "a",
+              { class: "diff-thumb", href: src(url), target: "_blank", title: "Открыть фото целиком", dataset: changed ? { mark } : undefined },
+              h("img", { src: thumb(url), alt: `Фото ${i + 1}`, loading: "lazy" }),
+              changed ? h("span", { class: "diff-thumb__tag" }, mark === "added" ? "новое" : "убрано") : null
+            );
+          })
+        )
+      : h("span", { class: "muted" }, "нет фото");
+  const added = after.filter((u) => !before.includes(u)).length;
+  const removed = before.filter((u) => !after.includes(u)).length;
+  const reordered = !added && !removed && before.join() !== after.join();
+  const summary = [
+    added && `добавлено ${added}`,
+    removed && `убрано ${removed}`,
+    reordered && "изменён порядок",
+    !added && !removed && !reordered && "без изменений",
+  ].filter(Boolean).join(", ");
+  return h(
+    "div",
+    { class: "diff-pair diff-pair--stack" },
+    h("p", { class: "small" }, summary, after[0] !== before[0] && after.length ? " · новая обложка" : ""),
+    diffSide(`Было — ${before.length} ${plural(before.length, "фото", "фото", "фото")}`, thumbRow(before, after, "removed")),
+    diffSide(`Стало — ${after.length} ${plural(after.length, "фото", "фото", "фото")}`, thumbRow(after, before, "added"))
+  );
 }
 
 // ---------- Заявки ----------
