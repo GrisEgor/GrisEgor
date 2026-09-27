@@ -60,6 +60,11 @@ async function buildApp(opts = {}) {
     return { ok: true };
   });
 
+  if (config.devOutbox) {
+    const { outbox } = require("./lib/mail");
+    app.get("/api/dev/outbox", async () => ({ messages: outbox.slice(-10).reverse() }));
+  }
+
   await app.register(require("./routes/auth"));
   await app.register(require("./routes/me"));
   await app.register(require("./routes/listings"));

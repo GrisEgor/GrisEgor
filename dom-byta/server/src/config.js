@@ -19,6 +19,9 @@ module.exports = {
   isProduction: env.NODE_ENV === "production",
 
   sessionDays: Number(env.SESSION_DAYS || 30),
+  // Только для локальной проверки: /api/dev/outbox показывает письма, которые не ушли
+  // (SMTP не настроен). На сервере не включать — иначе любой прочитает коды входа.
+  devOutbox: env.DEV_OUTBOX === "1" && env.NODE_ENV !== "production",
 
   // Почта. Без SMTP_HOST письма не отправляются, а пишутся в лог (удобно локально).
   smtp: {

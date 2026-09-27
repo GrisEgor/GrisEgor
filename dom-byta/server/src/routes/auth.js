@@ -175,6 +175,7 @@ async function routes(app) {
   app.get("/api/auth/me", async (req) => ({
     user: req.user ? await loadPublicUser(req.user.id) : null,
     providers: providers(),
+    devOutbox: config.devOutbox || undefined,
   }));
 
   app.post("/api/auth/logout", async (req, reply) => {

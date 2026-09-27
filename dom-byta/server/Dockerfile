@@ -9,8 +9,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY server/src ./src
 COPY site /app/site
+COPY panel /app/panel
 
-ENV SITE_DIR=/app/site UPLOADS_DIR=/app/uploads PORT=3000
+ENV SITE_DIR=/app/site PANEL_DIR=/app/panel UPLOADS_DIR=/app/uploads PORT=3000
 RUN mkdir -p /app/uploads && chown node:node /app/uploads
 USER node
 
