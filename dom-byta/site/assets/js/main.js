@@ -43,13 +43,23 @@
   // заново, а Netlify отдаёт статику с "max-age=0, must-revalidate" — то есть
   // на каждый клик уходил сетевой запрос, и фильтр заметно тормозил.
   var listingsDataPromise = null;
+  var statsQueue = [];
 
+  function fetchJson(url) {
+    return fetch(url).then(function (res) {
+      if (!res.ok) throw new Error("bad status " + res.status);
+      return res.json();
+    });
+  }
+
+  // Живые объявления — из API (их ведут собственники в кабинетах). Если сервер
+  // недоступен, показываем снимок data/listings.json, а без него — копию в index.html.
   function loadListingsData() {
     if (listingsDataPromise) return listingsDataPromise;
-    listingsDataPromise = fetch("data/listings.json")
-      .then(function (res) {
-        if (!res.ok) throw new Error("bad status " + res.status);
-        return res.json();
+    listingsDataPromise = fetchJson("/api/listings")
+      .catch(function (err) {
+        console.warn("API объявлений недоступно, берём data/listings.json:", err);
+        return fetchJson("data/listings.json");
       })
       .catch(function (err) {
         // Открыто как file://, оффлайн, или сервер не отдаёт JSON — используем
@@ -210,18 +220,25 @@
     grid.querySelectorAll("[data-listing-cta]").forEach(function (link) {
       link.addEventListener("click", function () {
         var listing = listingsById[link.getAttribute("data-listing-cta")];
-        if (listing) setRentFormFloor(listing.floor);
+        if (listing) {
+          setRentFormListing(listing);
+          track("cta", listing.id);
+        }
       });
     });
 
     grid.querySelectorAll("[data-listing-details]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         var listing = listingsById[btn.getAttribute("data-listing-details")];
-        if (listing) openListingModal(listing, btn);
+        if (listing) {
+          openListingModal(listing, btn);
+          track("open", listing.id);
+        }
       });
     });
 
     initCarousels(grid);
+    observeImpressions(grid);
 
     if (window.gsap && !prefersReducedMotion) {
       gsap.fromTo(grid.querySelectorAll(".listing-card"),
@@ -329,6 +346,29 @@
     if (select && floor) select.value = String(floor);
   }
 
+  // Заявка из карточки привязывается к помещению и уходит его собственнику.
+  var rentListingInput = document.querySelector("[data-rent-listing]");
+  var rentListingChip = document.querySelector("[data-rent-listing-chip]");
+
+  function setRentFormListing(listing) {
+    setRentFormFloor(listing && listing.floor);
+    if (!rentListingInput || !rentListingChip) return;
+    rentListingInput.value = listing ? listing.id : "";
+    rentListingChip.hidden = !listing;
+    if (listing) rentListingChip.querySelector("[data-rent-listing-title]").textContent = listing.title + " · этаж " + listing.floor;
+  }
+
+  if (rentListingChip) {
+    rentListingChip.querySelector("[data-rent-listing-clear]").addEventListener("click", function () { setRentFormListing(null); });
+    var rentFloorSelect = document.querySelector("[data-rent-floor-select]");
+    if (rentFloorSelect) {
+      rentFloorSelect.addEventListener("change", function () {
+        var current = listingsById[rentListingInput.value];
+        if (current && String(current.floor) !== rentFloorSelect.value) setRentFormListing(null);
+      });
+    }
+  }
+
   /* ---------- Listing details modal ---------- */
   var modalOverlay = document.querySelector("[data-modal-overlay]");
   var modalEl = document.querySelector("[data-modal]");
@@ -361,7 +401,8 @@
     var ctaLink = actions.querySelector("[data-modal-cta]");
     if (ctaLink) {
       ctaLink.addEventListener("click", function () {
-        setRentFormFloor(listing.floor);
+        setRentFormListing(listing);
+        track("cta", listing.id);
         closeListingModal();
       });
     }
@@ -558,7 +599,7 @@
     flush(); // то, что уже на экране, показываем сразу
   }
 
-  /* ---------- Forms: submit to serverless endpoint that forwards to Telegram/email ---------- */
+  /* ---------- Forms: заявки уходят в API, оттуда — собственнику и администратору ---------- */
   document.querySelectorAll("[data-form]").forEach(function (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -567,22 +608,37 @@
       var kind = form.getAttribute("data-form");
       var payload = { kind: kind };
       new FormData(form).forEach(function (value, key) { payload[key] = value; });
+      payload.consent = Boolean(form.querySelector('[name="consent"]:checked'));
+
+      if (!payload.consent) {
+        setStatus(statusEl, "Отметьте согласие на обработку персональных данных — без него заявку отправить нельзя.", "error");
+        return;
+      }
 
       if (submitBtn) submitBtn.disabled = true;
       setStatus(statusEl, "Отправляем…", null);
 
-      fetch("/.netlify/functions/contact", {
+      fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       })
         .then(function (res) {
-          if (!res.ok) throw new Error("bad status " + res.status);
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            if (!res.ok) {
+              var err = new Error(data.message || "bad status " + res.status);
+              err.fromServer = Boolean(data.message) && res.status < 500;
+              throw err;
+            }
+          });
+        })
+        .then(function () {
           setStatus(statusEl, "Заявка отправлена — мы свяжемся с вами.", "success");
           form.reset();
+          if (form.id === "rent-form") setRentFormListing(null);
         })
-        .catch(function () {
-          setStatus(statusEl, "Не получилось отправить форму. Напишите нам в Telegram или по телефону — контакты в разделе «Контакты».", "error");
+        .catch(function (err) {
+          setStatus(statusEl, err.fromServer ? err.message : "Не получилось отправить форму. Напишите нам в Telegram или по телефону — контакты в разделе «Контакты».", "error");
         })
         .finally(function () {
           if (submitBtn) submitBtn.disabled = false;
@@ -596,4 +652,120 @@
     if (state) el.setAttribute("data-state", state);
     else el.removeAttribute("data-state");
   }
+
+  /* ---------- Статистика для кабинетов ----------
+     Считаем просмотры страницы, показы и открытия карточек, клики «Оставить
+     заявку» и по контактам. Без cookie и персональных данных: только
+     случайный id браузера в localStorage, на сервере он хранится хешем. */
+  function track(type, listingCode) {
+    statsQueue.push(listingCode ? { t: type, l: listingCode } : { t: type });
+    if (statsQueue.length >= 20) flushStats();
+  }
+
+  function visitorId() {
+    try {
+      var id = localStorage.getItem("dbVisitor");
+      if (!id) {
+        id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem("dbVisitor", id);
+      }
+      return id;
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function flushStats() {
+    if (!statsQueue.length) return;
+    var body = JSON.stringify({ v: visitorId(), events: statsQueue.splice(0, 100) });
+    try {
+      fetch("/api/stats", { method: "POST", headers: { "Content-Type": "application/json" }, body: body, keepalive: true }).catch(function () {});
+    } catch (e) { /* статистика не важнее страницы */ }
+  }
+
+  // Карточка «показана», если хотя бы наполовину побыла в экране; каждая — один раз за визит.
+  var seenCards = {};
+  var impressionObserver = "IntersectionObserver" in window
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var code = entry.target.getAttribute("data-listing-code");
+          impressionObserver.unobserve(entry.target);
+          if (code && !seenCards[code]) {
+            seenCards[code] = true;
+            track("impression", code);
+          }
+        });
+      }, { threshold: 0.5 })
+    : null;
+
+  function observeImpressions(grid) {
+    if (!impressionObserver) return;
+    grid.querySelectorAll("[data-listing-details]").forEach(function (btn) {
+      var card = btn.closest(".listing-card");
+      if (!card) return;
+      card.setAttribute("data-listing-code", btn.getAttribute("data-listing-details"));
+      impressionObserver.observe(card);
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    var link = e.target.closest && e.target.closest('a[href^="tel:"], a[href^="mailto:"], a[href*="t.me/"], a[data-max-link]');
+    if (link) track("contact");
+  });
+
+  track("view");
+  setInterval(flushStats, 5000);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") flushStats();
+  });
+  window.addEventListener("pagehide", flushStats);
+
+  /* ---------- Вход: если уже в кабинете, ссылка ведёт туда ---------- */
+  fetchJson("/api/auth/me").then(function (me) {
+    if (!me.user) return;
+    document.querySelectorAll("[data-account-link]").forEach(function (a) {
+      a.textContent = "Кабинет";
+      a.href = me.user.role === "admin" ? "/admin/" : "/cabinet/";
+    });
+  }).catch(function () {});
+
+  /* ---------- Яндекс Метрика: номер счётчика — в админке, загрузка — после согласия ---------- */
+  var cookieBanner = document.querySelector("[data-cookie-banner]");
+
+  function cookieChoice(value) {
+    try {
+      if (value) localStorage.setItem("dbCookie", value);
+      return localStorage.getItem("dbCookie");
+    } catch (e) {
+      return value || null;
+    }
+  }
+
+  function loadMetrika(id) {
+    window.ym = window.ym || function () { (window.ym.a = window.ym.a || []).push(arguments); };
+    window.ym.l = Date.now();
+    var script = document.createElement("script");
+    script.async = true;
+    script.src = "https://mc.yandex.ru/metrika/tag.js";
+    document.head.appendChild(script);
+    window.ym(Number(id), "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true });
+  }
+
+  fetchJson("/api/settings").then(function (settings) {
+    if (!settings.metrikaId || !cookieBanner) return;
+    var choice = cookieChoice();
+    if (choice === "all") return loadMetrika(settings.metrikaId);
+    if (choice === "necessary") return;
+    cookieBanner.hidden = false;
+    cookieBanner.querySelector("[data-cookie-accept]").addEventListener("click", function () {
+      cookieChoice("all");
+      cookieBanner.hidden = true;
+      loadMetrika(settings.metrikaId);
+    });
+    cookieBanner.querySelector("[data-cookie-decline]").addEventListener("click", function () {
+      cookieChoice("necessary");
+      cookieBanner.hidden = true;
+    });
+  }).catch(function () {});
 })();

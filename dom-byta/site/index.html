@@ -41,7 +41,7 @@
 
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
-<link rel="stylesheet" href="assets/css/styles.css?v=8">
+<link rel="stylesheet" href="assets/css/styles.css?v=9">
 </head>
 <body>
 <a class="skip-link" href="#main">Перейти к основному содержимому</a>
@@ -61,6 +61,7 @@
       <a href="#building">О здании</a>
       <a href="#owners">Собственникам</a>
       <a href="#contacts">Контакты</a>
+      <a href="/login/" data-account-link>Войти</a>
     </nav>
 
     <a class="btn btn-primary nav-cta" href="#owners">Разместить объявление</a>
@@ -75,6 +76,7 @@
     <a href="#building">О здании</a>
     <a href="#owners">Собственникам</a>
     <a href="#contacts">Контакты</a>
+    <a href="/login/" data-account-link>Войти</a>
     <a class="btn btn-primary" href="#owners">Разместить объявление</a>
   </div>
 </header>
@@ -164,10 +166,14 @@
         <h2 data-anim="reveal-line">Сдаёте площадь в этом же здании?</h2>
         <p data-anim="fade-up">Этот сайт открыт для всех собственников здания на Васенко, 96 — не только для восьмого этажа. Оставьте заявку с описанием помещения, и мы добавим ваше объявление в общий список, чтобы его увидели те, кто ищет площадь именно в этом доме.</p>
         <ul class="about-points" data-anim="fade-up">
-          <li>Заявка уходит напрямую в Telegram и на почту — отвечаем оперативно.</li>
-          <li>Объявление добавляется вручную после проверки данных.</li>
-          <li>Изменить или снять объявление можно в любой момент — напишите нам.</li>
+          <li>Объявления ведёте сами в кабинете собственника: фото, цена, занятость.</li>
+          <li>Перед публикацией объявление проверяет администратор сайта.</li>
+          <li>Заявки арендаторов приходят вам в кабинет, на почту и в Telegram.</li>
         </ul>
+        <p class="owners-cabinet" data-anim="fade-up">
+          <a class="btn btn-primary" href="/login/?role=landlord">Разместить в кабинете</a>
+          <span>или оставьте заявку — поможем с объявлением</span>
+        </p>
       </div>
 
       <form class="card-form" id="owner-form" data-form="owner" novalidate>
@@ -193,6 +199,13 @@
         <div class="form-row">
           <label for="owner-desc">Описание помещения</label>
           <textarea id="owner-desc" name="description" rows="3" required></textarea>
+        </div>
+        <label class="form-consent">
+          <input type="checkbox" name="consent" required>
+          <span>Соглашаюсь на обработку персональных данных по <a href="/privacy/" target="_blank">политике конфиденциальности</a></span>
+        </label>
+        <div class="form-trap" aria-hidden="true">
+          <label>Сайт <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
         </div>
         <button class="btn btn-primary btn-block" type="submit">Отправить заявку</button>
         <p class="form-status" data-form-status role="status" aria-live="polite"></p>
@@ -245,6 +258,11 @@
 
       <form class="card-form" id="rent-form" data-form="rent" novalidate>
         <h3>Оставить заявку на аренду</h3>
+        <input type="hidden" name="listing" data-rent-listing>
+        <p class="form-listing" data-rent-listing-chip hidden>
+          <span>Помещение: <strong data-rent-listing-title></strong></span>
+          <button type="button" data-rent-listing-clear aria-label="Не привязывать заявку к этому помещению">×</button>
+        </p>
         <div class="form-row">
           <label for="rent-name">Имя</label>
           <input id="rent-name" name="name" type="text" autocomplete="name" required>
@@ -262,6 +280,13 @@
         <div class="form-row">
           <label for="rent-message">Сообщение</label>
           <textarea id="rent-message" name="message" rows="3" placeholder="Расскажите, для чего нужна площадь и на какой срок"></textarea>
+        </div>
+        <label class="form-consent">
+          <input type="checkbox" name="consent" required>
+          <span>Соглашаюсь на обработку персональных данных по <a href="/privacy/" target="_blank">политике конфиденциальности</a></span>
+        </label>
+        <div class="form-trap" aria-hidden="true">
+          <label>Сайт <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
         </div>
         <button class="btn btn-primary btn-block" type="submit">Отправить заявку</button>
         <p class="form-status" data-form-status role="status" aria-live="polite"></p>
@@ -312,9 +337,18 @@
       <a href="#owners">Собственникам</a>
       <a href="#contacts">Контакты</a>
     </nav>
+    <p class="footer-copy"><a href="/privacy/">Политика конфиденциальности</a> · <a href="/login/">Вход для собственников</a></p>
     <p class="footer-copy">© <span data-year>2026</span> Дом быта, Васенко 96. Сайт объединяет объявления собственников здания.</p>
   </div>
 </footer>
+
+<div class="cookie-banner" data-cookie-banner hidden>
+  <p>Мы используем cookie и Яндекс Метрику, чтобы понимать, какие помещения ищут. Подробнее — в <a href="/privacy/">политике конфиденциальности</a>.</p>
+  <div class="cookie-banner__actions">
+    <button class="btn btn-primary" type="button" data-cookie-accept>Хорошо</button>
+    <button class="btn btn-ghost" type="button" data-cookie-decline>Без Метрики</button>
+  </div>
+</div>
 
 <!--
   Резервная копия data/listings.json на случай, если страница открыта прямо
@@ -584,6 +618,6 @@
 </script>
 <script src="assets/js/vendor/gsap.min.js" defer></script>
 <script src="assets/js/vendor/ScrollTrigger.min.js" defer></script>
-<script src="assets/js/main.js?v=8" defer></script>
+<script src="assets/js/main.js?v=9" defer></script>
 </body>
 </html>

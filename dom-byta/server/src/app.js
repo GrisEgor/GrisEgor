@@ -95,6 +95,8 @@ async function buildApp(opts = {}) {
   await app.register(require("@fastify/static"), {
     root: config.siteDir,
     prefix: "/",
+    // /privacy → /privacy/ (папка с index.html).
+    redirect: true,
     setHeaders: noCacheHtml,
   });
 

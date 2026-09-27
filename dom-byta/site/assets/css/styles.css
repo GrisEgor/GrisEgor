@@ -859,3 +859,41 @@ section { padding: var(--space-7) 0; }
 @media (prefers-reduced-motion: reduce) {
   .js-anim-ready [data-anim] { opacity: 1 !important; transform: none !important; }
 }
+
+/* ---------- Кабинеты: вход, согласие в формах, баннер cookie ---------- */
+.owners-cabinet { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-4); }
+.owners-cabinet span { color: var(--color-fg-muted); font-size: 0.9rem; }
+
+.form-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 0.82rem; color: var(--color-fg-muted); cursor: pointer; }
+.form-consent input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--color-primary); flex-shrink: 0; }
+.form-consent a { color: var(--color-fg); text-decoration: underline; text-underline-offset: 2px; }
+/* Поле-ловушка для ботов: людям не видно, но остаётся в форме. */
+.form-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.form-listing {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent); font-size: 0.88rem;
+}
+.form-listing button {
+  border: 0; background: none; cursor: pointer; font-size: 1.2rem; line-height: 1;
+  color: var(--color-fg-muted); width: 32px; height: 32px; border-radius: var(--radius-sm); flex-shrink: 0;
+}
+.form-listing button:hover { color: var(--color-fg); background: var(--color-surface-2); }
+
+.footer-copy a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+.cookie-banner {
+  position: fixed; left: var(--space-3); right: var(--space-3); bottom: var(--space-3); z-index: 80;
+  max-width: 640px; margin: 0 auto;
+  display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  box-shadow: 0 16px 40px -16px color-mix(in srgb, var(--color-fg) 40%, transparent);
+  font-size: 0.88rem;
+}
+.cookie-banner p { flex: 1 1 280px; }
+.cookie-banner a { text-decoration: underline; text-underline-offset: 2px; }
+.cookie-banner__actions { display: flex; gap: var(--space-2); }
+/* На телефоне снизу живёт панель «Оставить заявку» — поднимаем баннер над ней. */
+@media (max-width: 640px) { .cookie-banner { bottom: 76px; padding: var(--space-3); } }
