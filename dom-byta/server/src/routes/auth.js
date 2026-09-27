@@ -299,7 +299,7 @@ async function routes(app) {
       const info = await p.fetchProfile(req.query, state);
       const { user, linked } = await externalLogin(req, { provider, ...info, reg: state });
       if (!linked) await createSession(req, reply, user.id);
-      return reply.redirect(linked ? "/cabinet/#profile" : state.next || homeFor(user));
+      return reply.redirect(linked ? `${homeFor(user)}#profile` : state.next || homeFor(user));
     } catch (err) {
       if (err.code === "registration_required") return fail("consent");
       if (err.code === "identity_taken" || err.code === "blocked") return fail(err.code);
