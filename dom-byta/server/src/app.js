@@ -64,6 +64,9 @@ async function buildApp(opts = {}) {
   await app.register(require("./routes/me"));
   await app.register(require("./routes/listings"));
   await app.register(require("./routes/uploads"));
+  await app.register(require("./routes/leads"));
+  await app.register(require("./routes/stats"));
+  await app.register(require("./routes/admin"));
 
   // Загруженные фото отдаём отдельным префиксом, чтобы не смешивать с файлами сайта.
   await app.register(require("@fastify/static"), {

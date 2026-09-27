@@ -57,4 +57,10 @@ Node.js 22 + Fastify 5, PostgreSQL 16, sharp (фото → webp), nodemailer (SM
 - [x] `src/migrate.js` (миграции + импорт `site/data/listings.json` в пустую таблицу),
       `src/app.js` + `src/index.js` (Fastify раздаёт `site/`, `/uploads/`, `/api/health`),
       `server/Dockerfile`, `docker-compose.yml`: `docker compose up --build` → http://localhost:8080.
-- [ ] Далее по пунктам этапа 1: вход → объявления → заявки и статистика → UI → интеграция.
+- [x] Вход (API): email-код и пароль, Telegram (виджет), Яндекс ID, VK ID (OAuth + PKCE), сессии,
+      роли, профиль и смена почты через код (`routes/auth.js`, `routes/me.js`).
+- [x] Объявления (API): публичный `/api/listings`, кабинет `/api/my/listings`, модерация
+      `/api/admin/listings`, загрузка фото `/api/uploads` (webp + превью).
+- [x] Заявки `/api/leads` + обработка, уведомления (email, Telegram), статистика `/api/stats`,
+      админка: пользователи, дашборд, журнал, настройки Метрики. Тесты: `npm test` в `server/`.
+- [ ] Далее: UI (вход, админка, кабинет собственника) → интеграция сайта → деплой.
