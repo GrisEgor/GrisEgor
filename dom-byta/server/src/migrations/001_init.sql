@@ -72,7 +72,7 @@ CREATE TABLE listings (
   title              text NOT NULL,
   type               text NOT NULL DEFAULT '',
   area_m2            numeric(8, 1) NOT NULL CHECK (area_m2 > 0),
-  price_per_m2       int NOT NULL CHECK (price_per_m2 >= 0),
+  price_per_m2       int NOT NULL DEFAULT 0 CHECK (price_per_m2 >= 0),
   description        text NOT NULL DEFAULT '',
   -- Занятость меняется собственником сразу, без модерации.
   availability       text NOT NULL DEFAULT 'available'

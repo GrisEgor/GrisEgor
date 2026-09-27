@@ -4,6 +4,16 @@ const config = require("../config");
 const db = require("../db");
 const { audit } = require("./audit");
 const { HttpError } = require("./http");
+const { notifyAdmins } = require("./notify");
+
+function landlordRequestMessage(user) {
+  const who = [user.name, user.email, user.phone].filter(Boolean).join(", ") || `пользователь #${user.id}`;
+  return {
+    subject: "Новый собственник ждёт подтверждения",
+    text: `Зарегистрировался собственник: ${who}. Подтвердите аккаунт в админке.`,
+    link: "/admin/#users",
+  };
+}
 
 function publicUser(u, identities = []) {
   return {
@@ -48,6 +58,7 @@ async function createUser({ email, name, phone, role, consent }) {
     [email || null, name || "", phone || "", role, status]
   );
   await audit(user.id, "register", "user", user.id, { role, status });
+  if (status === "pending") notifyAdmins(landlordRequestMessage(user));
   return user;
 }
 
@@ -67,4 +78,4 @@ function assertCanLogin(user) {
   if (user.status === "blocked") throw new HttpError(403, "blocked", "Аккаунт заблокирован");
 }
 
-module.exports = { publicUser, loadPublicUser, createUser, promoteAdminIfNeeded, assertCanLogin, isAdminEmail };
+module.exports = { landlordRequestMessage, publicUser, loadPublicUser, createUser, promoteAdminIfNeeded, assertCanLogin, isAdminEmail };

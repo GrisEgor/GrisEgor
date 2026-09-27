@@ -15,6 +15,7 @@ async function buildApp(opts = {}) {
   });
 
   fs.mkdirSync(config.uploadsDir, { recursive: true });
+  require("./lib/notify").setLogger(app.log);
 
   await app.register(require("@fastify/cookie"));
   await app.register(require("@fastify/multipart"), {
@@ -61,6 +62,8 @@ async function buildApp(opts = {}) {
 
   await app.register(require("./routes/auth"));
   await app.register(require("./routes/me"));
+  await app.register(require("./routes/listings"));
+  await app.register(require("./routes/uploads"));
 
   // Загруженные фото отдаём отдельным префиксом, чтобы не смешивать с файлами сайта.
   await app.register(require("@fastify/static"), {

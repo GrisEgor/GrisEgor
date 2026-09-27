@@ -4,7 +4,8 @@ const db = require("../db");
 const { audit } = require("../lib/audit");
 const { normEmail, sendCode, checkCode, consumeCode } = require("../lib/codes");
 const { requireUser } = require("../lib/sessions");
-const { loadPublicUser, promoteAdminIfNeeded } = require("../lib/users");
+const { loadPublicUser, promoteAdminIfNeeded, landlordRequestMessage } = require("../lib/users");
+const { notifyAdmins } = require("../lib/notify");
 const { HttpError, badRequest, str } = require("../lib/http");
 
 async function routes(app) {
@@ -66,6 +67,7 @@ async function routes(app) {
     if (req.user.role !== "tenant") throw badRequest("not_tenant", "У аккаунта уже есть роль собственника");
     await db.query("UPDATE users SET role = 'landlord', status = 'pending' WHERE id = $1", [req.user.id]);
     await audit(req.user.id, "landlord_request", "user", req.user.id);
+    notifyAdmins(landlordRequestMessage(req.user));
     return { user: await loadPublicUser(req.user.id) };
   });
 
