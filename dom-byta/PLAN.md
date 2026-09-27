@@ -54,8 +54,7 @@ Node.js 22 + Fastify 5, PostgreSQL 16, sharp (фото → webp), nodemailer (SM
 
 - [x] Сайт v8 восстановлен в `site/`.
 - [x] `server/`: зависимости, `src/config.js`, `src/db.js`, схема БД `src/migrations/001_init.sql`.
-- [ ] Следующий шаг: `src/migrate.js` (прогон миграций + импорт `site/data/listings.json`
-      в пустую таблицу listings), `src/index.js` (Fastify: раздаёт `site/`, `/api/health`),
-      `server/Dockerfile` и `docker-compose.yml` в `dom-byta/` — локальный запуск одной
-      командой `docker compose up --build`, сайт на http://localhost:8080.
+- [x] `src/migrate.js` (миграции + импорт `site/data/listings.json` в пустую таблицу),
+      `src/app.js` + `src/index.js` (Fastify раздаёт `site/`, `/uploads/`, `/api/health`),
+      `server/Dockerfile`, `docker-compose.yml`: `docker compose up --build` → http://localhost:8080.
 - [ ] Далее по пунктам этапа 1: вход → объявления → заявки и статистика → UI → интеграция.
