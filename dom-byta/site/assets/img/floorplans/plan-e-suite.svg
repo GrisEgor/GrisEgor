@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 400 264" role="img" aria-label="Схематичный план помещения: большая секция из трёх смежных комнат с окнами на две стороны">
+  <style>
+    .wall { stroke: #211D1A; }
+    .hatch { stroke: #DDD5C7; }
+    .accent-door { stroke: #B4442E; }
+    .accent-window { stroke: #C08A34; }
+    .label { fill: #8C8377; }
+    .mask { fill: #FBF8F2; }
+    /* Тёмный вариант намеренно убран: Safari на iOS не применяет
+       prefers-color-scheme к SVG, подключённому картинкой, поэтому в
+       тёмной теме он всё равно рисовал бы светлый вариант. План всегда
+       лежит на светлом фоне (см. .carousel__slide--plan img в
+       styles.css), так что тёмные линии читаются в любой теме. */
+  </style>
+  <!-- Фон намеренно не задан: он приходит от <img> в styles.css и всегда
+       светлый, чтобы тёмные линии плана читались в обеих темах. -->
+  <g class="hatch" stroke-width="1">
+    <path d="M60 60 L60 240 M100 60 L100 240 M140 60 L140 240 M180 60 L180 240 M220 60 L220 240 M260 60 L260 240 M300 60 L300 240 M340 60 L340 240"/>
+  </g>
+  <rect x="40" y="40" width="320" height="220" fill="none" class="wall" stroke-width="6" stroke-linejoin="round"/>
+  <!-- two internal partitions splitting the suite into three linked rooms -->
+  <line x1="146" y1="40" x2="146" y2="150" class="wall" stroke-width="6"/>
+  <line x1="146" y1="190" x2="146" y2="260" class="wall" stroke-width="6"/>
+  <path d="M146 150 A40 40 0 0 1 106 190" fill="none" class="accent-door" stroke-width="3" stroke-dasharray="4 3"/>
+  <line x1="253" y1="40" x2="253" y2="110" class="wall" stroke-width="6"/>
+  <line x1="253" y1="150" x2="253" y2="260" class="wall" stroke-width="6"/>
+  <path d="M253 110 A40 40 0 0 0 293 150" fill="none" class="accent-door" stroke-width="3" stroke-dasharray="4 3"/>
+  <!-- windows, one per room -->
+  <g class="accent-window" stroke-width="6">
+    <line x1="60" y1="40" x2="125" y2="40"/>
+    <line x1="175" y1="40" x2="225" y2="40"/>
+    <line x1="290" y1="40" x2="340" y2="40"/>
+  </g>
+  <!-- entrance -->
+  <rect x="70" y="257" width="30" height="6" class="mask"/>
+  <path d="M70 260 A30 30 0 0 0 100 230" fill="none" class="accent-door" stroke-width="3" stroke-dasharray="4 3"/>
+  <line x1="70" y1="260" x2="70" y2="230" class="accent-door" stroke-width="4"/>
+  <text x="360" y="288" text-anchor="end" font-family="Arial, sans-serif" font-size="14" class="label">план ориентировочный</text>
+</svg>

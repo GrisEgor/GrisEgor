@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 400 264" role="img" aria-label="Схематичный план помещения: небольшая комната площадью около 13 кв. м">
+  <style>
+    .wall { stroke: #211D1A; }
+    .hatch { stroke: #DDD5C7; }
+    .accent-door { stroke: #B4442E; }
+    .accent-window { stroke: #C08A34; }
+    .label { fill: #8C8377; }
+    .mask { fill: #FBF8F2; }
+    /* Тёмный вариант намеренно убран: Safari на iOS не применяет
+       prefers-color-scheme к SVG, подключённому картинкой, поэтому в
+       тёмной теме он всё равно рисовал бы светлый вариант. План всегда
+       лежит на светлом фоне (см. .carousel__slide--plan img в
+       styles.css), так что тёмные линии читаются в любой теме. */
+  </style>
+  <!-- Фон намеренно не задан: он приходит от <img> в styles.css и всегда
+       светлый, чтобы тёмные линии плана читались в обеих темах. -->
+  <g class="hatch" stroke-width="1">
+    <path d="M120 110 L120 210 M150 110 L150 210 M180 110 L180 210 M210 110 L210 210 M240 110 L240 210 M270 110 L270 210"/>
+  </g>
+  <rect x="100" y="90" width="200" height="140" fill="none" class="wall" stroke-width="6" stroke-linejoin="round"/>
+  <g class="accent-window" stroke-width="6">
+    <line x1="150" y1="90" x2="190" y2="90"/>
+  </g>
+  <rect x="180" y="227" width="30" height="6" class="mask"/>
+  <path d="M180 230 A30 30 0 0 0 210 200" fill="none" class="accent-door" stroke-width="3" stroke-dasharray="4 3"/>
+  <line x1="180" y1="230" x2="180" y2="200" class="accent-door" stroke-width="4"/>
+  <text x="200" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" class="label">≈13 м²</text>
+  <text x="360" y="288" text-anchor="end" font-family="Arial, sans-serif" font-size="14" class="label">план ориентировочный</text>
+</svg>

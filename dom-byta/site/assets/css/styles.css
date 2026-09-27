@@ -1,0 +1,899 @@
+/* ---------- Custom display font (self-hosted, provided by client) ---------- */
+@font-face {
+  font-family: "Lebowski Pragmatica";
+  src: url("../fonts/lebowski-pragmatica-regular.woff2") format("woff2"),
+       url("../fonts/lebowski-pragmatica-regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Body font (self-hosted PT Sans, was Google Fonts) ----------
+   Скачано с Google Fonts и положено рядом с сайтом: внешняя ссылка на
+   fonts.googleapis.com блокировала первую отрисовку страницы. unicode-range
+   оставлен, поэтому браузер тянет только нужный набор символов —
+   кириллицу для русского текста, латиницу для «MAX», «Telegram» и т.п. */
+@font-face {
+  font-family: "PT Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/pt-sans-400-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "PT Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/pt-sans-400-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "PT Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/pt-sans-700-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "PT Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/pt-sans-700-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ---------- Design tokens ---------- */
+:root {
+  --color-bg: #F3EFE7;
+  --color-surface: #FBF8F2;
+  --color-surface-2: #ECE4D5;
+  --color-fg: #211D1A;
+  --color-fg-muted: #6B6255;
+  --color-primary: #B4442E;
+  --color-primary-dark: #8F3523;
+  --color-on-primary: #FBF8F2;
+  --color-accent: #C08A34;
+  --color-border: #DDD5C7;
+  --color-available: #3F6B4E;
+  --color-reserved: #B4842E;
+  --color-occupied: #8C8377;
+  /* Darker variants for text-on-tint (badge labels): the base reserved/occupied
+     tokens above are also used as decorative bar fills on the floor-stack
+     diagram (contrast doesn't matter there), but as badge text on their own
+     16%-tint background they fall to 2.9:1 / 3.3:1 — below WCAG AA's 4.5:1
+     for small text. These pass at 4.8:1+. */
+  --color-reserved-text: #7D5C20;
+  --color-occupied-text: #696259;
+  --color-ring: #B4442E;
+
+  --font-display: "Lebowski Pragmatica", "PT Sans", system-ui, sans-serif;
+  /* PT Sans, not Inter/Roboto: designed by ParaType specifically for
+     Cyrillic under a Russian government public-typography initiative — a
+     civic-service typeface for a civic-service building. Only ships in
+     400/700, so every font-weight below is one of those two, not 500/600. */
+  --font-body: "PT Sans", system-ui, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;
+  --space-8: 96px;
+
+  --container-w: 1180px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-slow: 320ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1B1815;
+    --color-surface: #242019;
+    --color-surface-2: #2E2820;
+    --color-fg: #F3EFE7;
+    --color-fg-muted: #B7AE9E;
+    --color-primary: #D96146;
+    --color-primary-dark: #B4442E;
+    --color-on-primary: #1B1815;
+    --color-accent: #D9A24B;
+    --color-border: #3B342A;
+    --color-available: #6FA483;
+    --color-reserved: #D9A24B;
+    --color-occupied: #948C7C;
+    /* Base tokens already clear 4.5:1 against the dark bg (7.8:1 / 5.3:1),
+       so no separate darkened text variant is needed here. */
+    --color-reserved-text: #D9A24B;
+    --color-occupied-text: #948C7C;
+    --color-ring: #D96146;
+  }
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+body, h1, h2, h3, p, dl, dd, dt, ul, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+img, svg { display: block; max-width: 100%; }
+button { font: inherit; }
+input, textarea, select { font: inherit; color: inherit; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.12; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem); margin-bottom: var(--space-4); }
+h3 { font-size: 1.25rem; margin-bottom: var(--space-3); }
+
+a { color: inherit; text-decoration: none; }
+
+:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  padding: var(--space-2) var(--space-3);
+  z-index: 100;
+}
+.skip-link:focus-visible { left: var(--space-3); top: var(--space-3); }
+
+.container {
+  width: 100%;
+  max-width: var(--container-w);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+section { padding: var(--space-7) 0; }
+@media (max-width: 640px) { section { padding: var(--space-6) 0; } }
+
+.section-eyebrow {
+  font-family: var(--font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+  touch-action: manipulation;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+.btn-primary:hover { background: var(--color-primary-dark); }
+.btn-ghost { background: transparent; color: var(--color-fg); border-color: var(--color-border); }
+.btn-ghost:hover { background: var(--color-surface-2); }
+.btn-lg { min-height: 52px; padding: 0 var(--space-5); font-size: 1rem; }
+.btn-block { width: 100%; }
+.btn[disabled] { opacity: 0.6; cursor: default; }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 72px;
+}
+.brand { display: flex; align-items: center; gap: var(--space-2); margin-right: auto; }
+.brand-mark { flex-shrink: 0; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-title { font-family: var(--font-display); font-weight: 400; font-size: 1.05rem; }
+.brand-sub { font-size: 0.75rem; color: var(--color-fg-muted); }
+
+.nav { display: flex; gap: var(--space-4); }
+.nav a { font-weight: 400; color: var(--color-fg-muted); padding: var(--space-2) 0; }
+.nav a:hover { color: var(--color-fg); }
+
+.nav-cta { flex-shrink: 0; }
+.nav-toggle { display: none; }
+
+.nav-mobile {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+.nav-mobile a { padding: var(--space-2) 0; font-weight: 400; }
+
+@media (max-width: 860px) {
+  .nav, .nav-cta { display: none; }
+  .nav-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  .nav-toggle span { display: block; height: 2px; width: 22px; background: var(--color-fg); margin: 0 auto; transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-base) var(--ease-out); }
+  .site-header.is-open .nav-mobile { display: flex; }
+  .site-header.is-open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .site-header.is-open .nav-toggle span:nth-child(2) { opacity: 0; }
+  .site-header.is-open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+}
+
+/* ---------- Hero ---------- */
+.hero { position: relative; padding-top: var(--space-8); padding-bottom: var(--space-8); overflow: hidden; }
+.hero-bg {
+  position: absolute; inset: 0; z-index: -1; overflow: hidden;
+  background:
+    radial-gradient(600px circle at 85% 10%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 60%),
+    radial-gradient(500px circle at 0% 90%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 60%);
+}
+/* Line-art derived from a historical photo of the real building: a quiet
+   architectural signature rather than a stock hero image. A tall panel
+   pinned to the right edge, spanning the full hero height so it visibly
+   rises above and continues below the floor-stack card instead of hiding
+   almost entirely behind it — the building "stands" behind the diagram.
+   Faded only at its own left edge so it never competes with the hero
+   copy's contrast on the far left. */
+.hero-facade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(42%, 460px);
+  object-fit: contain;
+  object-position: bottom right;
+  opacity: 0.85;
+  -webkit-mask-image: linear-gradient(to left, #000 68%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 68%, transparent 100%);
+}
+.hero-facade-caption {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-3);
+  max-width: 26ch;
+  text-align: right;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--color-fg-muted);
+  opacity: 0.85;
+  z-index: 1;
+  pointer-events: none;
+  /* The illustration is denser now, so the caption can land directly on
+     top of a roofline or mullion — a soft halo keeps it legible without
+     boxing it in a hard chip. */
+  text-shadow: 0 0 6px var(--color-bg), 0 0 10px var(--color-bg), 0 0 14px var(--color-bg);
+}
+.hero-inner { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--space-7); align-items: center; }
+.eyebrow { font-weight: 700; color: var(--color-primary); letter-spacing: 0.04em; margin-bottom: var(--space-3); }
+.hero-title { font-size: clamp(2.25rem, 1.6rem + 3vw, 3.6rem); margin-bottom: var(--space-4); }
+.hero-title .line { display: block; overflow: hidden; }
+
+/* Section eyebrows + headings reuse the hero title's line-reveal motif
+   (one signature motion, repeated deliberately) instead of a second,
+   different scroll-fade recipe — see initReveals() in main.js. */
+[data-anim="reveal-line"] { overflow: hidden; }
+.hero-lede { max-width: 46ch; color: var(--color-fg-muted); font-size: 1.05rem; margin-bottom: var(--space-5); }
+.hero-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-6); }
+
+.hero-stats { display: flex; gap: var(--space-6); flex-wrap: wrap; }
+.stat { display: flex; flex-direction: column; }
+.stat-value { font-family: var(--font-display); font-size: 2rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 0.82rem; color: var(--color-fg-muted); }
+
+/* Floor stack signature */
+/* Порядок этажей — сверху вниз с 8-го по 1-й, как в реальном здании.
+   Раньше строки рисовались в JS снизу вверх (1→8), а здесь переворачивались
+   через column-reverse — из-за чего на мобильной раскладке ниже
+   (flex-direction: row) переворот пропадал и этажи шли 1→8, наоборот
+   относительно десктопа. Теперь JS сразу отдаёт их в нужном порядке
+   (см. renderFloorStack), а CSS ничего не переворачивает — обе раскладки
+   читаются одинаково. */
+.floor-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+}
+.floor-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  border: 1px solid transparent;
+  transition: border-color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out);
+}
+.floor-row:hover, .floor-row:focus-visible { border-color: var(--color-border); background: var(--color-surface-2); }
+.floor-row__num { font-family: var(--font-body); font-weight: 700; color: var(--color-fg-muted); text-align: center; }
+.floor-row__bar { height: 6px; border-radius: 4px; background: var(--color-border); overflow: hidden; }
+.floor-row__bar span { display: block; height: 100%; border-radius: 4px; }
+.floor-row[data-status="available"] .floor-row__bar span { background: var(--color-available); width: 100%; }
+.floor-row[data-status="reserved"] .floor-row__bar span { background: var(--color-reserved); width: 70%; }
+.floor-row[data-status="occupied"] .floor-row__bar span { background: var(--color-occupied); width: 15%; }
+.floor-row[data-status="unlisted"] { opacity: 0.55; }
+.floor-row[data-status="unlisted"] .floor-row__bar span { background: transparent; width: 0; border: 1px dashed var(--color-border); }
+.floor-row__label { font-size: 0.78rem; color: var(--color-fg-muted); white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  /* Headline + CTA stay first in source order (no reorder here on purpose):
+     the site's job is to get "Смотреть помещения" in front of visitors
+     immediately, especially on mobile — the floor-stack diagram is a nice
+     visual, but it's 8 rows tall and must not push the CTA below the fold. */
+
+  /* The hero grows much taller once it stacks, so a full-height right-hand
+     panel would run the entire length of the page. Switch to a fixed-height
+     block pinned to the top instead, next to the headline — and move the
+     caption up with it so it stays next to the art it describes rather than
+     stranded near the floor-stack card far below. */
+  .hero-facade {
+    top: 0; bottom: auto; height: 380px; width: min(52%, 320px);
+    object-position: top right; opacity: 0.6;
+  }
+  .hero-facade-caption { top: var(--space-3); bottom: auto; }
+}
+@media (max-width: 640px) {
+  .hero { padding-top: var(--space-6); padding-bottom: var(--space-6); }
+
+  /* Same reasoning as the mobile CTA-bar decision elsewhere: on a phone the
+     hero's one job is headline → CTA, immediately. A background illustration
+     behind that short a line length reads as clutter, not texture, so it
+     (and its caption) step aside below this breakpoint rather than shrink
+     further. */
+  .hero-facade, .hero-facade-caption { display: none; }
+
+  /* Floor stack, redesigned for mobile rather than reflowed: 8 stacked rows
+     is a lot of vertical scroll to get through on a phone before reaching
+     any actual content. A horizontally swipeable strip of floor "cards" —
+     thumb-swipe through floors like App Store category chips — reads as a
+     mobile-native browsing pattern instead of a shrunk desktop list. */
+  .floor-stack {
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--space-3);
+    -webkit-overflow-scrolling: touch;
+    gap: var(--space-2);
+    scrollbar-width: none;
+  }
+  .floor-stack::-webkit-scrollbar { display: none; }
+  .floor-row {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    flex: 0 0 76px;
+    scroll-snap-align: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-1);
+  }
+  .floor-row__bar {
+    position: relative;
+    width: 6px;
+    height: 44px;
+    order: 2;
+  }
+  .floor-row__bar span { position: absolute; left: 0; bottom: 0; width: 100%; height: 0; }
+  .floor-row[data-status="available"] .floor-row__bar span { width: 100%; height: 100%; }
+  .floor-row[data-status="reserved"] .floor-row__bar span { width: 100%; height: 70%; }
+  .floor-row[data-status="occupied"] .floor-row__bar span { width: 100%; height: 15%; }
+  .floor-row[data-status="unlisted"] .floor-row__bar span { width: 100%; height: 0; }
+  .floor-row__num { order: 1; }
+  .floor-row__label { order: 3; white-space: normal; font-size: 0.68rem; line-height: 1.2; }
+}
+
+/* ---------- About ---------- */
+.about-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--space-6); align-items: start; }
+.about-lede { font-size: 1.05rem; color: var(--color-fg-muted); max-width: 52ch; }
+.about-points { display: flex; flex-direction: column; gap: var(--space-3); }
+.about-points li { padding-left: var(--space-4); border-left: 2px solid var(--color-primary); }
+@media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; gap: var(--space-4); } }
+
+/* ---------- Listings ---------- */
+.listings-note { color: var(--color-fg-muted); max-width: 62ch; margin-bottom: var(--space-4); }
+.filters { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-5); }
+@media (max-width: 640px) {
+  /* Mobile-specific, not a shrunk desktop row: 9 chips wrapped to 3-4 lines
+     eats a screen's worth of height before you ever reach a listing. A
+     single horizontally-swipeable strip (with edge fade + snap) is the
+     native mobile pattern for this (App Store categories, etc.). */
+  .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 calc(var(--space-4) * -1) var(--space-5);
+    padding: 0 var(--space-4) var(--space-2);
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, transparent 0, black var(--space-4), black calc(100% - var(--space-6)), transparent 100%);
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-chip { flex: 0 0 auto; scroll-snap-align: start; }
+}
+.filter-chip {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-fg-muted);
+  border-radius: 999px;
+  padding: var(--space-2) var(--space-4);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+.filter-chip.is-active { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+.filter-chip:hover:not(.is-active) { border-color: var(--color-primary); color: var(--color-fg); }
+
+.listing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+@media (max-width: 980px) { .listing-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .listing-grid { grid-template-columns: 1fr; } }
+
+.listing-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+.listing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px -12px color-mix(in srgb, var(--color-fg) 25%, transparent); }
+.listing-card__body {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+.listing-card__top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-2); }
+.listing-card__floor { font-family: var(--font-body); font-weight: 700; color: var(--color-fg-muted); font-size: 0.85rem; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+  padding: 3px 10px; border-radius: 999px;
+}
+.badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge[data-status="available"] { color: var(--color-available); background: color-mix(in srgb, var(--color-available) 16%, transparent); }
+.badge[data-status="reserved"] { color: var(--color-reserved-text); background: color-mix(in srgb, var(--color-reserved) 16%, transparent); }
+.badge[data-status="occupied"] { color: var(--color-occupied-text); background: color-mix(in srgb, var(--color-occupied) 16%, transparent); }
+
+.listing-card h3 { margin-bottom: 0; }
+.listing-card__meta { display: flex; gap: var(--space-3); color: var(--color-fg-muted); font-size: 0.88rem; flex-wrap: wrap; }
+/* min-height (not flex:1) reserves ~3 lines so most cards read as roughly
+   uniform on their own; any leftover slack from row-stretching (cards in
+   the same grid row match the tallest) is absorbed below by
+   .listing-card__actions' margin-top:auto instead of stretching this
+   paragraph into a big empty gap. */
+.listing-card__desc { color: var(--color-fg-muted); font-size: 0.92rem; min-height: 4.8em; }
+/* На телефоне карточки идут в одну колонку — выравнивать их по высоте не с чем,
+   поэтому резерв под три строки превращается в пустоту под каждым коротким
+   описанием (а таких большинство). Убираем: текст занимает столько, сколько
+   занимает. На планшете и десктопе резерв остаётся — там колонок несколько. */
+@media (max-width: 640px) {
+  .listing-card__desc { min-height: 0; }
+}
+.listing-card__price { font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; }
+.listing-card__price small { font-family: var(--font-body); font-weight: 400; color: var(--color-fg-muted); font-size: 0.75rem; }
+.listing-card__actions { display: flex; gap: var(--space-2); margin-top: auto; padding-top: var(--space-2); }
+.listing-card__actions .btn { flex: 1; }
+/* На узком экране «Оставить заявку» не помещалось в половину строки и
+   переносилось на две — кнопки становились выше и разной высоты. Делим место
+   по длине надписи (flex-basis: auto) и сокращаем боковые отступы, чтобы обе
+   подписи легли в одну строку. */
+@media (max-width: 640px) {
+  .listing-card__actions .btn { flex: 1 1 auto; padding-inline: var(--space-3); }
+}
+
+.listing-empty { color: var(--color-fg-muted); padding: var(--space-5) 0; text-align: center; }
+
+/* ---------- Carousel (photos + floor plan demo media in listing cards) ---------- */
+.carousel {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--color-surface-2);
+  touch-action: pan-y;
+  /* Flush with the card's edges (no gap), so the matching corner radius is
+     the card's own radius, not a reduced/nested one. This is also the ONLY
+     clip in the chain: .carousel__track (below) carries the slide-swipe
+     `transform`, and giving that same element its own overflow/clip-path
+     turns out to make Chromium silently stop painting the now-visible
+     slide's <img> after the transform runs (confirmed: the image decodes
+     fine — canvas can read its pixels — it just never gets composited).
+     Clipping only on this non-transformed ancestor avoids that; each
+     .carousel__slide keeps its own overflow: hidden too, and neither of
+     those is transformed either, so this is safe. */
+  overflow: hidden;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+/* Планы обрезаны по содержимому (viewBox 400×264 ≈ 3:2), поэтому на телефоне
+   блок с медиа приводим к той же пропорции: сам план остаётся прежнего
+   размера, а пустые поля сверху и снизу уходят — каждая карточка становится
+   ниже примерно на 30px, а их на странице шестнадцать. */
+@media (max-width: 640px) {
+  .carousel { aspect-ratio: 3 / 2; }
+}
+
+/* Scrim so the dot indicators stay legible over light slides too (our demo
+   floor plans are pale cream, not just dark photos). Only needed when dots
+   are actually shown (2+ slides). */
+.carousel--multi::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 52px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45), transparent);
+  pointer-events: none;
+}
+.carousel__track {
+  display: flex;
+  height: 100%;
+  border-radius: inherit;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+.carousel__slide { flex: 0 0 100%; height: 100%; min-width: 0; overflow: hidden; border-radius: inherit; }
+.carousel__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--color-surface-2);
+  border-radius: inherit;
+}
+/* Планировки всегда лежат на светлой «бумаге», в тёмной теме тоже.
+   Раньше фон брался из var(--color-surface) (в тёмной теме — тёмный), а
+   нужный контраст обеспечивала @media (prefers-color-scheme: dark) внутри
+   самих SVG. Но Safari на iOS не применяет prefers-color-scheme к SVG,
+   подключённому через <img>: он рисует светлую версию, и почти чёрные
+   стены плана пропадали на тёмном фоне (воспроизведено на iPhone).
+   Поэтому фон здесь зафиксирован светлым, а из SVG тёмный блок убран —
+   план читается как лист бумаги в любой теме и в любом браузере. */
+.carousel__slide--plan img { object-fit: contain; background: #FBF8F2; padding: var(--space-2); }
+.carousel__badge {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  background: color-mix(in srgb, var(--color-fg) 65%, transparent);
+  color: var(--color-bg);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.carousel__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  color: var(--color-fg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.carousel__nav:hover { background: var(--color-surface); }
+.carousel__nav--prev { left: var(--space-2); }
+.carousel__nav--next { right: var(--space-2); }
+.carousel__dots {
+  position: absolute;
+  bottom: var(--space-2);
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.carousel__dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  /* Fixed light value, not a theme token: the bottom scrim above is always
+     dark (in both light/dark theme), so dots need to stay light to read
+     against it — using var(--color-bg) here would turn them dark-on-dark
+     in dark mode. */
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+}
+.carousel__dot.is-active { background: #fff; }
+/* Real hit area for dots stays >=44px via padding on the wrapping button without growing the visible dot. */
+.carousel__dots button { position: relative; }
+.carousel__dots button::after { content: ""; position: absolute; inset: -14px; }
+/* Подпись «план ориентировочный» нарисована внутри SVG по правому краю, а
+   точки — по центру поверх него. На широкой карточке они расходятся, на
+   телефоне налезали друг на друга. Прижимаем точки влево, где под ними
+   пусто. */
+@media (max-width: 640px) {
+  .carousel__dots { justify-content: flex-start; padding-left: var(--space-3); }
+}
+
+/* ---------- Owners / Contacts (form layout) ---------- */
+.owners-inner, .contacts-inner {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+@media (max-width: 900px) { .owners-inner, .contacts-inner { grid-template-columns: 1fr; } }
+/* В одну колонку 48px между текстом и формой читаются как разрыв, а не как
+   пауза: на десктопе это был горизонтальный зазор между колонками, по
+   вертикали столько не нужно. */
+@media (max-width: 640px) {
+  .owners-inner, .contacts-inner { gap: var(--space-4); }
+}
+
+.card-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: sticky;
+  top: 96px;
+}
+/* Липкость нужна только рядом с длинной колонкой текста на десктопе. В одну
+   колонку прилипать не к чему, а на iOS sticky внутри длинной страницы даёт
+   рывки при инерционной прокрутке. Заодно поджимаем поля формы. */
+@media (max-width: 640px) {
+  .card-form { position: static; padding: var(--space-4); gap: var(--space-2); }
+}
+
+.form-row { display: flex; flex-direction: column; gap: 6px; }
+.form-row label { font-size: 0.85rem; font-weight: 700; }
+.form-row input, .form-row textarea, .form-row select {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  min-height: 44px;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.form-row textarea { min-height: 84px; resize: vertical; }
+.form-row input:focus-visible, .form-row textarea:focus-visible, .form-row select:focus-visible { border-color: var(--color-primary); }
+.form-row-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.form-status { min-height: 1.2em; font-size: 0.85rem; }
+.form-status[data-state="success"] { color: var(--color-available); }
+.form-status[data-state="error"] { color: var(--color-primary); }
+
+/* ---------- Contacts ---------- */
+.contact-links { display: flex; flex-direction: column; gap: var(--space-2); margin: var(--space-4) 0; }
+.contact-links a {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out);
+}
+.contact-links a:hover { border-color: var(--color-primary); background: var(--color-surface); }
+.contact-links__label { font-weight: 700; font-family: var(--font-body); font-size: 0.85rem; }
+.contact-links__value { color: var(--color-fg-muted); font-size: 0.9rem; text-align: right; }
+.contact-links__value em { color: var(--color-primary); font-style: normal; font-weight: 700; }
+
+.map-embed { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); }
+.map-embed iframe { display: block; width: 100%; height: 320px; border: 0; }
+
+/* ---------- Footer ---------- */
+.site-footer { border-top: 1px solid var(--color-border); padding: var(--space-6) 0; }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.footer-brand { display: flex; flex-direction: column; }
+.footer-nav { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+.footer-nav a { color: var(--color-fg-muted); font-size: 0.9rem; }
+.footer-nav a:hover { color: var(--color-fg); }
+.footer-copy { width: 100%; color: var(--color-fg-muted); font-size: 0.82rem; }
+
+/* ---------- Listing details modal ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-fg) 55%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.modal-overlay.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px -20px color-mix(in srgb, var(--color-fg) 45%, transparent);
+  transform: translateY(12px) scale(0.98);
+  transition: transform var(--dur-base) var(--ease-out);
+  /* Thin, theme-matched scrollbar instead of the default OS one — a wide
+     light-grey system scrollbar reads as a bug against a dark modal. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+.modal-overlay.is-open .modal { transform: translateY(0) scale(1); }
+.modal::-webkit-scrollbar { width: 8px; }
+.modal::-webkit-scrollbar-track { background: transparent; }
+.modal::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 999px; }
+.modal::-webkit-scrollbar-thumb:hover { background: var(--color-fg-muted); }
+
+.modal__close {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: color-mix(in srgb, var(--color-fg) 55%, transparent);
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.modal__close:hover { background: color-mix(in srgb, var(--color-fg) 75%, transparent); }
+
+.modal__media .carousel { aspect-ratio: 16 / 10; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.modal__body { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); }
+.modal__body h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; margin-bottom: 0; }
+.modal__desc { color: var(--color-fg-muted); }
+.modal__owner { color: var(--color-fg-muted); font-size: 0.85rem; }
+.modal__actions { margin-top: var(--space-2); }
+
+@media (max-width: 640px) {
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal { max-width: 100%; max-height: 92dvh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; transform: translateY(100%); }
+  .modal-overlay.is-open .modal { transform: translateY(0); }
+}
+
+/* ---------- Mobile-only floating CTA bar ---------- */
+.mobile-cta-bar { display: none; }
+@media (max-width: 640px) {
+  .mobile-cta-bar {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    padding: var(--space-2) var(--space-4) calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--color-border);
+    transform: translateY(120%);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .mobile-cta-bar.is-visible { transform: translateY(0); }
+  .modal-overlay.is-open ~ .mobile-cta-bar { display: none; }
+}
+
+/* ---------- Scroll-reveal base state (JS adds .is-visible via GSAP; this is the no-JS/reduced-motion fallback) ---------- */
+[data-anim] { opacity: 1; }
+.js-anim-ready [data-anim] { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .js-anim-ready [data-anim] { opacity: 1 !important; transform: none !important; }
+}
+
+/* ---------- Кабинеты: вход, согласие в формах, баннер cookie ---------- */
+.owners-cabinet { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-4); }
+.owners-cabinet span { color: var(--color-fg-muted); font-size: 0.9rem; }
+
+.form-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 0.82rem; color: var(--color-fg-muted); cursor: pointer; }
+.form-consent input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--color-primary); flex-shrink: 0; }
+.form-consent a { color: var(--color-fg); text-decoration: underline; text-underline-offset: 2px; }
+/* Поле-ловушка для ботов: людям не видно, но остаётся в форме. */
+.form-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.form-listing {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent); font-size: 0.88rem;
+}
+.form-listing button {
+  border: 0; background: none; cursor: pointer; font-size: 1.2rem; line-height: 1;
+  color: var(--color-fg-muted); width: 32px; height: 32px; border-radius: var(--radius-sm); flex-shrink: 0;
+}
+.form-listing button:hover { color: var(--color-fg); background: var(--color-surface-2); }
+
+.footer-copy a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+.cookie-banner {
+  position: fixed; left: var(--space-3); right: var(--space-3); bottom: var(--space-3); z-index: 80;
+  max-width: 640px; margin: 0 auto;
+  display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  box-shadow: 0 16px 40px -16px color-mix(in srgb, var(--color-fg) 40%, transparent);
+  font-size: 0.88rem;
+}
+.cookie-banner p { flex: 1 1 280px; }
+.cookie-banner a { text-decoration: underline; text-underline-offset: 2px; }
+.cookie-banner__actions { display: flex; gap: var(--space-2); }
+/* На телефоне снизу живёт панель «Оставить заявку» — поднимаем баннер над ней. */
+@media (max-width: 640px) { .cookie-banner { bottom: 76px; padding: var(--space-3); } }

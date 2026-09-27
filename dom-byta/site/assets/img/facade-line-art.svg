@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 900" role="img" aria-label="">
+  <style>
+    .wall { stroke: #B4442E; }
+    .mullion { stroke: #B4442E; }
+    .column { stroke: #B4442E; }
+    .tree { stroke: #B4442E; fill: #B4442E; }
+    .fill-wash { fill: #B4442E; }
+    @media (prefers-color-scheme: dark) {
+      .wall { stroke: #D96146; }
+      .mullion { stroke: #D96146; }
+      .column { stroke: #D96146; }
+      .tree { stroke: #D96146; fill: #D96146; }
+      .fill-wash { fill: #D96146; }
+    }
+  </style>
+  <!-- Original line-art derived from a historical photo of the real
+       building at Vasenko 96: a slender round-column, curved-glass ground
+       floor pavilion under an eight-floor rectangular tower. The tower's
+       eight bands echo the floor-stack diagram elsewhere on the page.
+       A faint tinted fill sits under the line detail so the silhouette
+       reads clearly even at low opacity, instead of vanishing into a set
+       of thin strokes. Purely decorative: aria-hidden by its container. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+
+    <rect class="fill-wash" x="180" y="60" width="280" height="590" fill-opacity="0.07" stroke="none"/>
+    <path class="fill-wash" d="M110 656 Q320 630 530 656 L530 820 L110 820 Z" fill-opacity="0.07" stroke="none"/>
+
+    <line class="wall" x1="40" y1="822" x2="600" y2="822" stroke-width="2" opacity="0.6"/>
+
+    <g class="tree" opacity="0.45">
+      <line x1="90" y1="822" x2="90" y2="763" stroke-width="3"/>
+      <path d="M90 690 C68 690 55 705 60 722 C48 725 47 745 65 750 C68 760 82 763 90 756
+               C98 763 118 760 122 750 C140 745 139 725 127 722 C132 705 112 690 90 690 Z"
+            stroke-width="2"/>
+    </g>
+
+    <g class="wall" stroke-width="3">
+      <rect x="180" y="60" width="280" height="590"/>
+    </g>
+    <line class="wall" x1="170" y1="58" x2="470" y2="58" stroke-width="4"/>
+
+    <g class="mullion" stroke-width="1.5" opacity="0.85">
+      <line x1="180" y1="133.75" x2="460" y2="133.75"/>
+      <line x1="180" y1="207.5" x2="460" y2="207.5"/>
+      <line x1="180" y1="281.25" x2="460" y2="281.25"/>
+      <line x1="180" y1="355" x2="460" y2="355"/>
+      <line x1="180" y1="428.75" x2="460" y2="428.75"/>
+      <line x1="180" y1="502.5" x2="460" y2="502.5"/>
+      <line x1="180" y1="576.25" x2="460" y2="576.25"/>
+    </g>
+    <g class="mullion" stroke-width="1" opacity="0.5">
+      <line x1="215" y1="66" x2="215" y2="644"/>
+      <line x1="250" y1="66" x2="250" y2="644"/>
+      <line x1="285" y1="66" x2="285" y2="644"/>
+      <line x1="320" y1="66" x2="320" y2="644"/>
+      <line x1="355" y1="66" x2="355" y2="644"/>
+      <line x1="390" y1="66" x2="390" y2="644"/>
+      <line x1="425" y1="66" x2="425" y2="644"/>
+    </g>
+
+    <path class="wall" d="M110 656 Q320 630 530 656" stroke-width="3"/>
+
+    <g class="mullion" stroke-width="1" opacity="0.55">
+      <line x1="180" y1="659" x2="180" y2="820"/>
+      <line x1="250" y1="658" x2="250" y2="820"/>
+      <line x1="320" y1="657" x2="320" y2="820"/>
+      <line x1="390" y1="658" x2="390" y2="820"/>
+      <line x1="460" y1="659" x2="460" y2="820"/>
+    </g>
+    <g class="column" stroke-width="3">
+      <line x1="145" y1="660" x2="145" y2="818"/>
+      <circle cx="145" cy="660" r="6" stroke-width="2"/>
+      <line x1="215" y1="659" x2="215" y2="818"/>
+      <circle cx="215" cy="659" r="6" stroke-width="2"/>
+      <line x1="285" y1="658" x2="285" y2="818"/>
+      <circle cx="285" cy="658" r="6" stroke-width="2"/>
+      <line x1="355" y1="658" x2="355" y2="818"/>
+      <circle cx="355" cy="658" r="6" stroke-width="2"/>
+      <line x1="425" y1="659" x2="425" y2="818"/>
+      <circle cx="425" cy="659" r="6" stroke-width="2"/>
+      <line x1="495" y1="660" x2="495" y2="818"/>
+      <circle cx="495" cy="660" r="6" stroke-width="2"/>
+    </g>
+    <line class="wall" x1="110" y1="820" x2="530" y2="820" stroke-width="2" opacity="0.7"/>
+  </g>
+</svg>

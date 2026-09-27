@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" role="img" aria-label="">
+  <style>
+    .icon { stroke: #8C8377; }
+    .label { fill: #8C8377; }
+    @media (prefers-color-scheme: dark) {
+      .icon { stroke: #B7AE9E; }
+      .label { fill: #B7AE9E; }
+    }
+  </style>
+  <!-- Shared placeholder for real (non-demo) listings that don't have a
+       photo yet. No background rect on purpose, same reasoning as the
+       floor-plan SVGs: transparent, so the carousel's own surface colour
+       shows through and matches the current theme. -->
+  <g class="icon" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8">
+    <rect x="140" y="95" width="120" height="90" rx="6"/>
+    <circle cx="166" cy="121" r="8"/>
+    <path d="M150 165 L179 136 L203 160 L224 141 L250 165"/>
+  </g>
+  <text x="200" y="218" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" class="label">Фото появится позже</text>
+</svg>

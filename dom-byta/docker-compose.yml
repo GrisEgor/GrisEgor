@@ -1,0 +1,50 @@
+# Локальный запуск: docker compose up --build → http://localhost:8080
+services:
+  db:
+    restart: unless-stopped
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dombyta
+      POSTGRES_PASSWORD: dombyta
+      POSTGRES_DB: dombyta
+    # Порт наружу — только для тестов с этой машины (npm test в server/).
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dombyta"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  app:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgres://dombyta:dombyta@db:5432/dombyta
+      PUBLIC_URL: http://localhost:8080
+      NODE_ENV: development
+      # Этот адрес при входе становится администратором (можно переопределить в .env).
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      # Письма без SMTP видны на /api/dev/outbox (только локально).
+      DEV_OUTBOX: "1"
+    ports:
+      - "8080:3000"
+    volumes:
+      - uploads:/app/uploads
+      # Сайт и кабинеты берутся прямо из папок — правки видны без пересборки.
+      - ./site:/app/site:ro
+      - ./panel:/app/panel:ro
+
+volumes:
+  db-data:
+  uploads:

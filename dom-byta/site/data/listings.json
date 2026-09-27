@@ -1,0 +1,254 @@
+{
+  "_readme": "Снимок объявлений на момент перехода на кабинеты. Теперь объявления ведутся в админке и кабинетах собственников и хранятся в базе; сайт берёт их из /api/listings. Этот файл нужен в двух случаях: при самом первом запуске сервер импортирует его в пустую базу, а если API недоступно, сайт показывает эту копию. Править его больше не нужно.",
+  "building": {
+    "name": "Дом быта",
+    "addressShort": "ул. Васенко, 96",
+    "addressFull": "г. Челябинск, ул. Васенко, 96",
+    "floors": 8
+  },
+  "listings": [
+    {
+      "id": "f1-01",
+      "floor": 1,
+      "title": "Торговое помещение с отдельным входом",
+      "areaM2": 62,
+      "pricePerM2": 950,
+      "type": "Ритейл",
+      "description": "Витринные окна на улицу, отдельный вход, высокая проходимость первого этажа.",
+      "status": "available",
+      "owner": "Собственник этажа 1",
+      "floorPlan": "assets/img/floorplans/plan-d-strip.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "id": "f1-02",
+      "floor": 1,
+      "title": "Аптечный пункт",
+      "areaM2": 28,
+      "pricePerM2": 980,
+      "type": "Ритейл",
+      "description": "Небольшой формат у входа, готовые торговые стеллажи.",
+      "status": "occupied",
+      "owner": "Собственник этажа 1",
+      "floorPlan": "assets/img/floorplans/plan-a-rect.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "id": "f2-01",
+      "floor": 2,
+      "title": "Помещение для мастерской или ателье",
+      "areaM2": 38,
+      "pricePerM2": 780,
+      "type": "Мастерская / услуги",
+      "description": "Отдельный кабинет с окном, подходит под ремонт, ателье, приём клиентов.",
+      "status": "available",
+      "owner": "Собственник этажа 2",
+      "floorPlan": "assets/img/floorplans/plan-a-rect.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "id": "f3-01",
+      "floor": 3,
+      "title": "Помещение под фотостудию",
+      "areaM2": 34,
+      "pricePerM2": 750,
+      "type": "Студия",
+      "description": "Высокие потолки, естественный свет из двух окон, отдельный санузел на этаже.",
+      "status": "available",
+      "owner": "Собственник этажа 3",
+      "floorPlan": "assets/img/floorplans/plan-a-rect.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "id": "f4-01",
+      "floor": 4,
+      "title": "Кабинет для салона или студии",
+      "areaM2": 45,
+      "pricePerM2": 820,
+      "type": "Салон / студия",
+      "description": "Готовая перегородка на 2 зоны, санузел на этаже, лифт.",
+      "status": "reserved",
+      "owner": "Собственник этажа 4",
+      "floorPlan": "assets/img/floorplans/plan-c-split.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "id": "f5-01",
+      "floor": 5,
+      "title": "Кабинет для приёма клиентов",
+      "areaM2": 26,
+      "pricePerM2": 800,
+      "type": "Услуги",
+      "description": "Тихий кабинет вдали от лестницы, подходит для консультаций и приёма по записи.",
+      "status": "available",
+      "owner": "Собственник этажа 5",
+      "floorPlan": "assets/img/floorplans/plan-a-rect.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "id": "f6-01",
+      "floor": 6,
+      "title": "Офисное помещение открытой планировки",
+      "areaM2": 70,
+      "pricePerM2": 700,
+      "type": "Офис",
+      "description": "Свободная планировка, можно разделить на 2 кабинета, отдельная электрика под оргтехнику.",
+      "status": "available",
+      "owner": "Собственник этажа 6",
+      "floorPlan": "assets/img/floorplans/plan-b-lshape.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "id": "f6-02",
+      "floor": 6,
+      "title": "Шоурум мебели и предметов интерьера",
+      "areaM2": 58,
+      "pricePerM2": 720,
+      "type": "Шоурум",
+      "description": "Широкие дверные проёмы для заноса крупногабаритных образцов, отдельный грузовой лифт.",
+      "status": "reserved",
+      "owner": "Собственник этажа 6",
+      "floorPlan": "assets/img/floorplans/plan-d-strip.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "id": "f7-01",
+      "floor": 7,
+      "title": "Ателье по ремонту одежды",
+      "areaM2": 30,
+      "pricePerM2": 760,
+      "type": "Мастерская / услуги",
+      "description": "Действующее ателье, помещение с готовыми рабочими местами и раскроечным столом.",
+      "status": "occupied",
+      "owner": "Собственник этажа 7",
+      "floorPlan": "assets/img/floorplans/plan-a-rect.svg",
+      "photos": [
+        "assets/img/placeholder.png",
+        "assets/img/placeholder.png"
+      ]
+    },
+    {
+      "_comment": "Этаж 8 — по реальному плану БТИ (фото плана предоставлено собственником). Площади и цены ниже — ориентировочные, прочитанные со скана плана; перед публикацией сверьте их с техпаспортом и решите цену и актуальный статус (все 7 временно помечены available).",
+      "id": "f8-01",
+      "floor": 8,
+      "title": "Офис №87 — три смежных кабинета",
+      "areaM2": 145,
+      "pricePerM2": 780,
+      "type": "Офис",
+      "description": "Самая крупная секция на этаже: три смежных кабинета с окнами на обе стороны здания, соединены внутренними дверями.",
+      "status": "available",
+      "owner": "Собственник этажа 8 (управляющий сайтом)",
+      "demo": false,
+      "floorPlan": "assets/img/floorplans/plan-e-suite.svg",
+      "photos": ["assets/img/placeholder.png"]
+    },
+    {
+      "id": "f8-02",
+      "floor": 8,
+      "title": "Офис №145",
+      "areaM2": 52,
+      "pricePerM2": 820,
+      "type": "Офис",
+      "description": "Блок из двух смежных кабинетов рядом с лестницей.",
+      "status": "available",
+      "owner": "Собственник этажа 8 (управляющий сайтом)",
+      "demo": false,
+      "floorPlan": "assets/img/floorplans/plan-c-split.svg",
+      "photos": ["assets/img/placeholder.png"]
+    },
+    {
+      "id": "f8-03",
+      "floor": 8,
+      "title": "Офис №98 — у входа на этаж",
+      "areaM2": 48,
+      "pricePerM2": 850,
+      "type": "Офис",
+      "description": "Помещение рядом с главным входом на этаж: широкий дверной проём и небольшая зона ресепшен.",
+      "status": "available",
+      "owner": "Собственник этажа 8 (управляющий сайтом)",
+      "demo": false,
+      "floorPlan": "assets/img/floorplans/plan-f-entry.svg",
+      "photos": ["assets/img/placeholder.png"]
+    },
+    {
+      "id": "f8-04",
+      "floor": 8,
+      "title": "Офис №62",
+      "areaM2": 58,
+      "pricePerM2": 800,
+      "type": "Офис",
+      "description": "Отдельный кабинет в тихой части этажа, вдали от лестницы.",
+      "status": "available",
+      "owner": "Собственник этажа 8 (управляющий сайтом)",
+      "demo": false,
+      "floorPlan": "assets/img/floorplans/plan-a-rect.svg",
+      "photos": ["assets/img/placeholder.png"]
+    },
+    {
+      "id": "f8-05",
+      "floor": 8,
+      "title": "Офис №118 — просторный кабинет",
+      "areaM2": 95,
+      "pricePerM2": 760,
+      "type": "Офис",
+      "description": "Один из самых просторных кабинетов этажа: вытянутая форма, несколько окон.",
+      "status": "available",
+      "owner": "Собственник этажа 8 (управляющий сайтом)",
+      "demo": false,
+      "floorPlan": "assets/img/floorplans/plan-d-strip.svg",
+      "photos": ["assets/img/placeholder.png"]
+    },
+    {
+      "id": "f8-06",
+      "floor": 8,
+      "title": "Офис №38 — угловое помещение",
+      "areaM2": 62,
+      "pricePerM2": 830,
+      "type": "Офис",
+      "description": "Угловое помещение с окнами на две стороны здания.",
+      "status": "available",
+      "owner": "Собственник этажа 8 (управляющий сайтом)",
+      "demo": false,
+      "floorPlan": "assets/img/floorplans/plan-b-lshape.svg",
+      "photos": ["assets/img/placeholder.png"]
+    },
+    {
+      "id": "f8-07",
+      "floor": 8,
+      "title": "Кабинет №8/13",
+      "areaM2": 13,
+      "pricePerM2": 900,
+      "type": "Офис",
+      "description": "Небольшой кабинет у лестничной клетки — под архив, серверную или компактное рабочее место.",
+      "status": "available",
+      "owner": "Собственник этажа 8 (управляющий сайтом)",
+      "demo": false,
+      "floorPlan": "assets/img/floorplans/plan-g-nook.svg",
+      "photos": ["assets/img/placeholder.png"]
+    }
+  ]
+}
