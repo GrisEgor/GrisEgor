@@ -1,0 +1,56 @@
+# Сервер: docker compose -f docker-compose.prod.yml up -d --build
+# Настройки — в файле .env рядом (образец: .env.example). Инструкция: DEPLOY.md.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dombyta
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Задайте DB_PASSWORD в .env}
+      POSTGRES_DB: dombyta
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dombyta"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  app:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://dombyta:${DB_PASSWORD}@db:5432/dombyta
+      PUBLIC_URL: https://${DOMAIN:?Задайте DOMAIN в .env}
+    volumes:
+      - uploads:/app/uploads
+
+  # Caddy сам получает и продлевает сертификат Let's Encrypt для DOMAIN.
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  db-data:
+  uploads:
+  caddy-data:
+  caddy-config:
