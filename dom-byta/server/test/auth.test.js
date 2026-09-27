@@ -99,6 +99,14 @@ test("заблокированный пользователь не может в
 test("запросы с чужого Origin отклоняются", async () => {
   const r = await post("/api/auth/email/request", { email: "x@test.ru" }, { origin: "https://evil.example" });
   assert.equal(r.statusCode, 403);
+  // Чужой Origin не помогает, даже если выдать себя за локальную сеть.
+  const spoof = await post("/api/auth/email/request", { email: "x@test.ru" }, { origin: "http://192.168.1.5:8080", host: "localhost:8080" });
+  assert.equal(spoof.statusCode, 403);
+});
+
+test("свой сайт по другому адресу (телефон в локальной сети) — пропускается", async () => {
+  const r = await post("/api/auth/email/request", { email: "phone@test.ru" }, { origin: "http://192.168.1.5:8080", host: "192.168.1.5:8080" });
+  assert.equal(r.statusCode, 200, r.body);
 });
 
 function signTelegram(data, token = "123:test-token") {

@@ -33,14 +33,22 @@ async function buildApp(opts = {}) {
   });
 
   // Защита от CSRF: cookie у нас SameSite=Lax, а изменяющие запросы к API
-  // с чужих сайтов отсекаем по заголовку Origin.
+  // с чужих сайтов отсекаем по заголовку Origin. Свой сайт — это PUBLIC_URL или
+  // тот адрес, по которому пришёл сам запрос (например, IP компьютера в локальной
+  // сети, когда проверяют с телефона).
   const allowedOrigin = new URL(config.publicUrl).origin;
   app.addHook("onRequest", async (req, reply) => {
     if (!req.url.startsWith("/api/") || req.method === "GET" || req.method === "HEAD") return;
     const origin = req.headers.origin;
-    if (origin && origin !== allowedOrigin && !opts.allowAnyOrigin) {
-      return reply.code(403).send({ error: "bad_origin", message: "Запрос с чужого сайта" });
+    if (!origin || origin === allowedOrigin || opts.allowAnyOrigin) return;
+    let originHost = null;
+    try {
+      originHost = new URL(origin).host;
+    } catch {
+      originHost = null;
     }
+    if (originHost && originHost === req.host) return;
+    return reply.code(403).send({ error: "bad_origin", message: "Запрос с чужого сайта" });
   });
 
   app.addHook("onRequest", async (req) => {
